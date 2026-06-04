@@ -7,6 +7,9 @@
     "apps/backend",
     "packages/shared"
   ],
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "npm run dev --workspaces --parallel",
     "dev:frontend": "npm --prefix apps/frontend run dev",
