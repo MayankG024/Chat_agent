@@ -21,7 +21,13 @@ export class NvidiaProvider implements LLMProvider {
   private readonly maxRetries: number;
 
   constructor() {
-    this.apiKey = env.NVIDIA_API_KEY;
+    let rawKey = env.NVIDIA_API_KEY.trim();
+    // Strip surrounding quotes if present (e.g. from Render/Vercel ENV inputs)
+    if ((rawKey.startsWith('"') && rawKey.endsWith('"')) || (rawKey.startsWith("'") && rawKey.endsWith("'"))) {
+      rawKey = rawKey.slice(1, -1).trim();
+    }
+    // Ensure Bearer prefix is present
+    this.apiKey = rawKey.startsWith('Bearer ') ? rawKey : `Bearer ${rawKey}`;
     this.model = env.NVIDIA_MODEL;
     // Base URL for the NVIDIA NIM API chat completions
     this.baseUrl = 'https://integrate.api.nvidia.com/v1';
@@ -50,7 +56,7 @@ export class NvidiaProvider implements LLMProvider {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': this.apiKey.startsWith('Bearer ') ? this.apiKey : `Bearer ${this.apiKey}`,
+            'Authorization': this.apiKey,
             'Accept': 'application/json',
           },
           body: JSON.stringify({

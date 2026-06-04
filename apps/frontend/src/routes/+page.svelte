@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type { Message } from '@chat-agent/shared';
-  import { MockChatService } from '$lib/mockChatService';
   import SessionStatus from '$lib/components/SessionStatus.svelte';
   import ChatList from '$lib/components/ChatList.svelte';
   import ChatInput from '$lib/components/ChatInput.svelte';
@@ -14,11 +13,9 @@
   // Connection, Streaming & Thinking states
   let isConnecting = false;
   let isThinking = false;
-  let isStreaming = false; // No streaming in /chat/message yet, it returns simple JSON
+  let isStreaming = false;
   let currentStreamText = '';
 
-  // Toggle for testing client-side only (mock mode) or live backend
-  let isMockMode = false;
   let chatListRef: ChatList;
   let errorMessage = '';
 
@@ -37,19 +34,6 @@
     isThinking = false;
     isStreaming = false;
     currentStreamText = '';
-
-    if (isMockMode) {
-      try {
-        const data = await MockChatService.createSession();
-        sessionId = data.sessionId;
-        messages = await MockChatService.getHistory(sessionId);
-      } catch (err) {
-        console.error('Mock session init failed:', err);
-      } finally {
-        isConnecting = false;
-      }
-      return;
-    }
 
     // Live mode backend integration
     try {
@@ -90,7 +74,7 @@
           id: 'error_init',
           conversationId: 'error',
           role: 'assistant',
-          content: '⚠️ Unable to connect to the support server. Please make sure the backend is running at http://localhost:4000.',
+          content: '⚠️ Unable to connect to the support server. Please make sure the backend is running and reachable.',
           createdAt: new Date().toISOString()
         }
       ];
@@ -101,12 +85,6 @@
         if (chatListRef) chatListRef.scrollToBottom('smooth');
       }, 100);
     }
-  }
-
-  // Toggle Live/Mock Mode
-  async function handleToggleMode() {
-    isMockMode = !isMockMode;
-    await initializeSession();
   }
 
   // Handle message sending
@@ -130,31 +108,6 @@
 
     // Show loading state (thinking dots) and disable input/send
     isThinking = true;
-
-    if (isMockMode) {
-      try {
-        await MockChatService.sendMessageStream(
-          sessionId,
-          text,
-          (chunk) => {
-            if (isThinking) {
-              isThinking = false;
-              isStreaming = true;
-            }
-            currentStreamText += chunk;
-          },
-          (assistantMsg) => {
-            messages = [...messages, assistantMsg];
-            isStreaming = false;
-            currentStreamText = '';
-          }
-        );
-      } catch (err) {
-        console.error('Mock stream failed:', err);
-        isThinking = false;
-      }
-      return;
-    }
 
     // Live mode POST /chat/message call
     try {
@@ -230,8 +183,6 @@
   <SessionStatus
     {sessionId}
     {isConnecting}
-    {isMockMode}
-    onToggleMode={handleToggleMode}
   />
 
   {#if isConnecting}

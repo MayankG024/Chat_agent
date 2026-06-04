@@ -1,8 +1,6 @@
 <script lang="ts">
   export let sessionId = '';
   export let isConnecting = false;
-  export let isMockMode = true;
-  export let onToggleMode: () => void = () => {};
 
   let copied = false;
 
@@ -43,18 +41,6 @@
   </div>
 
   <div class="flex flex-wrap items-center gap-3 text-xs">
-    <!-- Mode Toggle Button -->
-    <button
-      on:click={onToggleMode}
-      class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700/60 hover:border-indigo-500/50 hover:bg-indigo-950/20 active:scale-95 transition duration-200"
-      title="Click to toggle between Mock and Live API mode"
-    >
-      <span class="h-2 w-2 rounded-full {isMockMode ? 'bg-indigo-400 shadow-sm shadow-indigo-400/50' : 'bg-rose-400 shadow-sm shadow-rose-400/50'}"></span>
-      <span class="text-[10px] font-mono uppercase tracking-wider text-slate-300">
-        {isMockMode ? 'Mock Simulator' : 'Live Express API'}
-      </span>
-    </button>
-
     <!-- Session details -->
     {#if sessionId}
       <button
