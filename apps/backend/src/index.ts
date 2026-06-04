@@ -1,6 +1,8 @@
+import './loadEnv'; // Must be first to load environment variables
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
+import { prisma } from './prisma';
+import { redis } from './redis';
 import type { 
   CreateSessionResponse, 
   SendMessageRequest, 
@@ -8,18 +10,56 @@ import type {
   Message
 } from '@chat-agent/shared';
 
-// Load environment variables from root directory
-dotenv.config({ path: '../../.env' });
-
 const app = express();
 const port = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(express.json());
 
-// Basic health check route
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get('/health', async (req, res) => {
+  let dbStatus = 'unhealthy';
+  let redisStatus = 'unhealthy';
+  let isHealthy = true;
+
+  try {
+    // Check Postgres connection by running a simple query
+    await prisma.$queryRaw`SELECT 1`;
+    dbStatus = 'ok';
+  } catch (error) {
+    console.error('Health Check - Database Error:', error);
+    dbStatus = `unhealthy: ${(error as Error).message}`;
+    isHealthy = false;
+  }
+
+  try {
+    // Check Redis connection by pinging
+    const pingResponse = await redis.ping();
+    if (pingResponse === 'PONG') {
+      redisStatus = 'ok';
+    } else {
+      redisStatus = `unhealthy: Unexpected ping response "${pingResponse}"`;
+      isHealthy = false;
+    }
+  } catch (error) {
+    console.error('Health Check - Redis Error:', error);
+    redisStatus = `unhealthy: ${(error as Error).message}`;
+    isHealthy = false;
+  }
+
+  const response = {
+    status: isHealthy ? 'ok' : 'error',
+    timestamp: new Date().toISOString(),
+    services: {
+      database: dbStatus,
+      redis: redisStatus,
+    },
+  };
+
+  if (isHealthy) {
+    res.json(response);
+  } else {
+    res.status(503).json(response);
+  }
 });
 
 // Create a session route
