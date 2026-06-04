@@ -36,9 +36,15 @@ function loadEnv() {
 
 loadEnv();
 
+// Check if running a database command/migration vs running the application server
+const isMigration = process.argv.some(arg => arg.includes('migrate') || arg.includes('db') || arg.includes('prisma'));
+const dbUrl = isMigration 
+  ? (process.env.DIRECT_URL || process.env.DATABASE_URL) 
+  : (process.env.DATABASE_URL || process.env.DIRECT_URL);
+
 export default defineConfig({
   schema: './prisma/schema.prisma',
   datasource: {
-    url: process.env.DIRECT_URL,
+    url: dbUrl,
   },
 });

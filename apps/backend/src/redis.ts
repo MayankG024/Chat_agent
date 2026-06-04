@@ -1,6 +1,8 @@
 import { Redis } from 'ioredis';
+import { logger } from './utils/logger.js';
+import { env } from './config/env.js';
 
-const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+const redisUrl = env.REDIS_URL;
 
 // Configure Redis with auto-reconnection and robust defaults
 export const redis = new Redis(redisUrl, {
@@ -14,25 +16,25 @@ export const redis = new Redis(redisUrl, {
 
 // Setup event listeners for connection monitoring and debugging
 redis.on('connect', () => {
-  console.log('Connecting to Redis server...');
+  logger.info('Connecting to Redis server...');
 });
 
 redis.on('ready', () => {
-  console.log('Redis client is ready and connected successfully.');
+  logger.info('Redis client is ready and connected successfully.');
 });
 
 redis.on('error', (err) => {
-  console.error('Redis client error:', err);
+  logger.error({ err }, 'Redis client error');
 });
 
 redis.on('close', () => {
-  console.warn('Redis client connection closed.');
+  logger.warn('Redis client connection closed.');
 });
 
-redis.on('reconnecting', (delay) => {
-  console.log(`Redis client reconnecting in ${delay}ms...`);
+redis.on('reconnecting', (delay: number) => {
+  logger.info(`Redis client reconnecting in ${delay}ms...`);
 });
 
 redis.on('end', () => {
-  console.error('Redis connection has ended. No more retries.');
+  logger.error('Redis connection has ended. No more retries.');
 });

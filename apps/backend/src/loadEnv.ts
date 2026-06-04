@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+// Load and validate environment variables via our centralized config/env
+import { env } from './config/env.js';
 
-// Load environment variables from the monorepo root directory
-dotenv.config({ path: '../../.env' });
+export { env };

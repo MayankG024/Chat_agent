@@ -17,6 +17,10 @@ export default {
           900: '#26348f',
           950: '#1b2154',
         }
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        display: ['Outfit', 'sans-serif'],
       }
     },
   },

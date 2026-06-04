@@ -1,4 +1,5 @@
-import { redis } from '../redis';
+import { redis } from '../redis.js';
+import { logger } from '../utils/logger.js';
 import type { Message } from '@chat-agent/shared';
 
 export class CacheService {
@@ -11,7 +12,7 @@ export class CacheService {
       const data = await redis.get(`conversation:${id}`);
       return data ? JSON.parse(data) : null;
     } catch (error) {
-      console.error(`Cache Read Error (getConversation:${id}):`, error);
+      logger.error(error, `Cache Read Error (getConversation:${id})`);
       return null;
     }
   }
@@ -24,7 +25,7 @@ export class CacheService {
     try {
       await redis.setex(`conversation:${id}`, ttlSeconds, JSON.stringify(data));
     } catch (error) {
-      console.error(`Cache Write Error (setConversation:${id}):`, error);
+      logger.error(error, `Cache Write Error (setConversation:${id})`);
     }
   }
 
@@ -35,7 +36,7 @@ export class CacheService {
     try {
       await redis.del(`conversation:${id}`);
     } catch (error) {
-      console.error(`Cache Invalidation Error (deleteConversation:${id}):`, error);
+      logger.error(error, `Cache Invalidation Error (deleteConversation:${id})`);
     }
   }
 
@@ -47,7 +48,7 @@ export class CacheService {
       const data = await redis.get(`history:${sessionId}`);
       return data ? JSON.parse(data) : null;
     } catch (error) {
-      console.error(`Cache Read Error (getChatHistory:${sessionId}):`, error);
+      logger.error(error, `Cache Read Error (getChatHistory:${sessionId})`);
       return null;
     }
   }
@@ -59,7 +60,7 @@ export class CacheService {
     try {
       await redis.setex(`history:${sessionId}`, ttlSeconds, JSON.stringify(messages));
     } catch (error) {
-      console.error(`Cache Write Error (setChatHistory:${sessionId}):`, error);
+      logger.error(error, `Cache Write Error (setChatHistory:${sessionId})`);
     }
   }
 
@@ -70,7 +71,7 @@ export class CacheService {
     try {
       await redis.del(`history:${sessionId}`);
     } catch (error) {
-      console.error(`Cache Invalidation Error (deleteChatHistory:${sessionId}):`, error);
+      logger.error(error, `Cache Invalidation Error (deleteChatHistory:${sessionId})`);
     }
   }
 
@@ -96,7 +97,7 @@ export class CacheService {
       const ttlResult = results[1];
 
       if (countResult[0] || ttlResult[0]) {
-        console.error('Rate Limiter Pipeline Error:', countResult[0] || ttlResult[0]);
+        logger.error({ err: countResult[0] || ttlResult[0] }, 'Rate Limiter Pipeline Error');
         return false;
       }
 
@@ -110,7 +111,7 @@ export class CacheService {
 
       return count > limit;
     } catch (error) {
-      console.error(`Rate Limiter Connection Error for ${ip}:`, error);
+      logger.error(error, `Rate Limiter Connection Error for ${ip}`);
       return false; // Fail open
     }
   }

@@ -9,16 +9,17 @@
   ],
   "scripts": {
     "dev": "npm run dev --workspaces --parallel",
-    "dev:frontend": "npm run dev --workspace=apps/frontend",
-    "dev:backend": "npm run dev --workspace=apps/backend",
-    "build:frontend": "npm run build --workspace=apps/frontend",
-    "build:backend": "npm run build --workspace=apps/backend",
-    "build:shared": "npm run build --workspace=packages/shared",
+    "dev:frontend": "npm --prefix apps/frontend run dev",
+    "dev:backend": "npm --prefix apps/backend run dev",
+    "build:frontend": "npm --prefix apps/frontend run build",
+    "preview:frontend": "npm --prefix apps/frontend run preview",
+    "build:backend": "tsc --project apps/backend/tsconfig.json",
+    "build:shared": "tsc --project packages/shared/tsconfig.json",
     "build": "npm run build:shared && npm run build:backend && npm run build:frontend",
     "lint": "npm run lint --workspaces --if-present",
     "format": "prettier --write \"**/*.{ts,js,json,svelte,css,md}\"",
-    "db:generate": "npm run db:generate --workspace=apps/backend",
-    "db:migrate": "npm run db:migrate --workspace=apps/backend"
+    "db:generate": "npm --prefix apps/backend run db:generate",
+    "db:migrate": "npm --prefix apps/backend run db:migrate"
   },
   "devDependencies": {
     "prettier": "^3.2.5",
