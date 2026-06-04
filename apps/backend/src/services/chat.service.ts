@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 import { ConversationRepository, MessageRepository } from '../repositories/index.js';
 import { CacheService } from './cache.service.js';
-import { NvidiaProvider } from './llm/nvidia.provider.js';
-import { buildPrompt } from './prompt/index.js';
+import { NvidiaProvider } from './llm.service.js';
+import { buildPrompt } from './prompt.service.js';
 import { NotFoundError } from '../errors/AppError.js';
 import { logger } from '../utils/logger.js';
 import { runWithRetryAndTimeout } from '../utils/retry.js';

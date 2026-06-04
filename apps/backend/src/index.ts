@@ -1,4 +1,4 @@
-import './loadEnv.js'; // Must be first to load environment variables
+import './config/env.js'; // Must be first to load environment variables
 import express from 'express';
 import cors from 'cors';
 import crypto from 'crypto';
