@@ -1,0 +1,33 @@
+{
+  "name": "@chat-agent/frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev --port 5173",
+    "build": "vite build",
+    "preview": "vite preview",
+    "prepare": "svelte-kit sync",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+  },
+  "dependencies": {
+    "@chat-agent/shared": "*",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.3.0"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-auto": "^3.2.0",
+    "@sveltejs/kit": "^2.5.10",
+    "@sveltejs/vite-plugin-svelte": "^3.1.0",
+    "@types/node": "^20.12.12",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "svelte": "^4.2.18",
+    "svelte-check": "^3.7.1",
+    "tailwindcss": "^3.4.3",
+    "tslib": "^2.6.2",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11"
+  }
+}
